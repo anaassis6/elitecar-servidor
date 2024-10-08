@@ -125,7 +125,7 @@ export class Cliente {
                     
                 );
 
-                novoCliente.setIdCliente(cliente.id);
+                novoCliente.setIdCliente(cliente.id_cliente);
 
                 listaDeClientes.push(novoCliente);
 
