@@ -1,7 +1,14 @@
+import { DatabaseModel } from "./DatabaseModel";
+
+const database = new DatabaseModel().pool;
+
 /**
  * Classe que representa um carro.
  */
 export class Carro {
+    static listarCarro() {
+        throw new Error('Method not implemented.');
+    }
 
     /* Atributos */
     /* Identificador do carro */
@@ -123,4 +130,38 @@ export class Carro {
     public setCor(cor: string): void {
         this.cor = cor;
     }
-}
+    
+    //MÉTODO PARA ACESSAR O BANCO DE DADOS
+    static async listarCarros(): Promise<Array<Carro> | null> {
+
+        let listaDeCarros: Array<Carro> = [];
+
+        try {
+
+            const querySelectCarro = `SELECT * FROM carro`;
+
+            const respostaBD = await database.query(querySelectCarro);
+
+            respostaBD.rows.forEach((carro) => {
+                let novoCarro = new Carro(
+                    carro.marca,
+                    carro.modelo,
+                    carro.ano,
+                    carro.cor
+                );
+
+                novoCarro.setIdCarro(carro.id_carro);
+
+                listaDeCarros.push(novoCarro);
+
+            });
+
+            //Retornando a lista para quem chamou a função
+            return listaDeCarros;
+
+        } catch (error) {
+            console.log(`Erro ao acessar o modelo: ${error}`);
+            return null;
+        }
+    }
+}    

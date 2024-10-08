@@ -1,7 +1,10 @@
+import { DatabaseModel } from "./DatabaseModel";
+
+const database = new DatabaseModel().pool;
+
 /**
  * Classe que represeta um Pedido de Venda
  */
-
 export class PedidoVenda {
 
     /* Atributos */
@@ -121,5 +124,39 @@ export class PedidoVenda {
      */
     public setValorPedido(valorPedido: number): void {
         this.valorPedido = valorPedido;
+    }
+
+    //MÉTODO PARA ACESSAR BANCO DE DADOS
+    static async listarPedidosVenda(): Promise<Array<PedidoVenda> | null> {
+
+        let listaDePedidoVenda: Array<PedidoVenda> = [];
+
+        try {
+
+            const querySelectPedidoVenda = `SELECT * FROM pedido_venda`;
+
+            const respostaBD = await database.query(querySelectPedidoVenda);
+
+            respostaBD.rows.forEach((pedido_venda) => {
+                let novoPedidoVenda = new PedidoVenda(
+                    pedido_venda.id_carro,
+                    pedido_venda.id_cliente,
+                    pedido_venda.data_pedido,
+                    pedido_venda.valor_pedido,
+                );
+
+                novoPedidoVenda.setIdPedido(pedido_venda.id_pedido);
+
+                listaDePedidoVenda.push(novoPedidoVenda);
+
+            });    
+            //Retornando a lista para quem chamou
+            return listaDePedidoVenda;
+
+
+        } catch (error) {
+            console.log(`Erro ao acessar o modelo: ${error}`);
+            return null;
+        }
     }
 }   
