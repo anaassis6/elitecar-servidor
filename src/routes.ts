@@ -1,21 +1,33 @@
 import { Request, Response, Router } from "express";
-import CarroController from "./controller/CarroController";
-import ClienteController from "./controller/ClienteController";
-import PedidoVendaController from "./controller/PedidoVendaController";
+import { CarroController } from "./controller/CarroController";
+import { ClienteController } from "./controller/ClienteController";
+import { PedidoVendaController } from "./controller/PedidoVendaController";
 
-//criando um roteador
+// Cria um roteador
 const router = Router();
 
-//criando uma rota principal para a aplicação
-router.get("/", (req: Request, res:Response) => {
-    res.json({ mensagem: "Olá mundo!"});
+// Criando uma rota principal para a aplicação
+router.get("/", (req: Request, res: Response) => {
+    res.json({ mensagem: "Olá, mundo!" });
 });
 
-router.get("/carros", CarroController.todos);
+/* 
+* ROTAS PARA CARROS
+*/ 
+// Rota para listar os carros
+router.get("/lista/carros", CarroController.todos);
 
-router.get("/clientes", ClienteController.todos);
+/* 
+* ROTAS PARA CLIENTES
+*/ 
+// Rota para listar os clientes
+router.get("/lista/clientes", ClienteController.todos);
 
-router.get("/pedidos", PedidoVendaController.todos);
+/* 
+* ROTAS PARA PEDIDOS
+*/ 
+// Rota para listar os pedidos
+router.get("/lista/pedidos", PedidoVendaController.todos);
 
-//exportando as rotas
-export {router};
+// exportando as rotas
+export { router };

@@ -105,39 +105,38 @@ export class Cliente {
     public setTelefone(telefone: string): void {
         this.telefone = telefone;
     }
-
-    //MÉTODO PARA ACESSAR  O BANCO DE DADOS
-    static async listarClientes(): Promise<Array<Cliente> | null>{
-
-        let listaDeClientes: Array<Cliente> = [];
+    /**
+        * Busca e retorna uma lista de clientes do banco de dados.
+        * @returns Um array de objetos do tipo `Cliente` em caso de sucesso ou `null` se ocorrer um erro durante a consulta.
+        * 
+        * - A função realiza uma consulta SQL para obter todos os registros da tabela "cliente".
+        * - Os dados retornados são utilizados para instanciar objetos da classe `Cliente`.
+        * - Cada cliente instanciado é adicionado a uma lista que será retornada ao final da execução.
+        * - Se houver uma falha na consulta ao banco, a função captura o erro, exibe uma mensagem no console e retorna `null`.
+        */
+    static async listagemClientes(): Promise<Array<Cliente> | null> {
+        const listaDeClientes: Array<Cliente> = [];
 
         try {
-
             const querySelectCliente = `SELECT * FROM cliente`;
-
             const respostaBD = await database.query(querySelectCliente);
 
-            respostaBD.rows.forEach((cliente) => {
-                let novoCliente = new Cliente(
-                    cliente.nome,
-                    cliente.cpf,
-                    cliente.telefone,
-                    
+            respostaBD.rows.forEach((linha) => {
+                const novoCliente = new Cliente(
+                    linha.nome,
+                    linha.cpf,
+                    linha.telefone
                 );
 
-                novoCliente.setIdCliente(cliente.id_cliente);
+                novoCliente.setIdCliente(linha.id_cliente);
 
                 listaDeClientes.push(novoCliente);
+            });
 
-            });    
-            // Retornando a lista para quem chamou a função
             return listaDeClientes;
-
-
         } catch (error) {
-            console.log(`Erro ao acessar o modelo: ${error}`);
+            console.log('Erro ao buscar lista de carros');
             return null;
         }
     }
-
 }

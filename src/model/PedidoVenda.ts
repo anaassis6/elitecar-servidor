@@ -116,47 +116,39 @@ export class PedidoVenda {
         return this.valorPedido;
     }
 
-
     /**
-     * Define o valor do pedido
-     * 
-     * @param valorPedido - Valor do pedido
-     */
-    public setValorPedido(valorPedido: number): void {
-        this.valorPedido = valorPedido;
-    }
-
-    //MÉTODO PARA ACESSAR BANCO DE DADOS
-    static async listarPedidosVenda(): Promise<Array<PedidoVenda> | null> {
-
-        let listaDePedidoVenda: Array<PedidoVenda> = [];
+        * Busca e retorna uma lista de pedidos de venda do banco de dados.
+        * @returns Um array de objetos do tipo `PedidoVenda` em caso de sucesso ou `null` se ocorrer um erro durante a consulta.
+        * 
+        * - A função realiza uma consulta SQL para obter todos os registros da tabela "pedido_venda".
+        * - Os dados retornados são utilizados para instanciar objetos da classe `PedidoVenda`.
+        * - Cada pedido de venda instanciado é adicionado a uma lista que será retornada ao final da execução.
+        * - Caso ocorra uma falha na consulta ao banco, a função captura o erro, exibe uma mensagem no console e retorna `null`.
+        */
+    static async listagemPedidos(): Promise<Array<PedidoVenda> | null> {
+        const listaDePedidos: Array<PedidoVenda> = [];
 
         try {
+            const querySelectPedidos = `SELECT * FROM pedido_venda;`;
+            const respostaBD = await database.query(querySelectPedidos);
 
-            const querySelectPedidoVenda = `SELECT * FROM pedido_venda`;
-
-            const respostaBD = await database.query(querySelectPedidoVenda);
-
-            respostaBD.rows.forEach((pedido_venda) => {
-                let novoPedidoVenda = new PedidoVenda(
-                    pedido_venda.id_carro,
-                    pedido_venda.id_cliente,
-                    pedido_venda.data_pedido,
-                    pedido_venda.valor_pedido,
+            respostaBD.rows.forEach((linha) => {
+                const novoPedidoVenda = new PedidoVenda(
+                    linha.id_carro,
+                    linha.id_cliente,
+                    linha.data_pedido,
+                    parseFloat(linha.valor_pedido)
                 );
 
-                novoPedidoVenda.setIdPedido(pedido_venda.id_pedido);
+                novoPedidoVenda.setIdPedido(linha.id_pedido);
 
-                listaDePedidoVenda.push(novoPedidoVenda);
+                listaDePedidos.push(novoPedidoVenda);
+            });
 
-            });    
-            //Retornando a lista para quem chamou
-            return listaDePedidoVenda;
-
-
+            return listaDePedidos;
         } catch (error) {
-            console.log(`Erro ao acessar o modelo: ${error}`);
+            console.log('Erro ao buscar lista de pedidos');
             return null;
         }
     }
-}   
+}
