@@ -222,6 +222,7 @@ export class Carro {
             return false;
         }
     }
+    
     /**
      * Remove um carro do banco de dados com base no ID fornecido.
      * 

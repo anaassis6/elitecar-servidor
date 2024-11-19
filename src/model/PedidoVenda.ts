@@ -141,7 +141,7 @@ export class PedidoVenda {
                 );
 
                 novoPedidoVenda.setIdPedido(linha.id_pedido);
-                
+
 
                 listaDePedidos.push(novoPedidoVenda);
             });
@@ -197,37 +197,58 @@ export class PedidoVenda {
             return false;
         }
     }
-
+    /**
+     * Remove um pedido de venda do banco de dados com base no ID fornecido.
+     * 
+     * Esta função executa uma query para excluir um registro na tabela `pedido_venda` que corresponda 
+     * ao ID fornecido. Retorna `true` se a remoção for bem-sucedida (linhas afetadas) ou `false` caso contrário.
+     * 
+     * @param {number} idPedido - ID do pedido de venda a ser removido.
+     * @returns {Promise<boolean>} - Retorna `true` se o pedido foi removido com sucesso, `false` caso contrário.
+     * 
+     * @throws {Error} - Caso ocorra um erro na execução da query, ele será logado no console.
+     */
     static async removerPedido(idPedido: number): Promise<boolean> {
         try {
             // Query para deletar o pedido pelo ID
             const queryDeletePedido = `DELETE FROM pedido_venda 
                                         WHERE id_pedido = ${idPedido}`;
-    
-            // Executar a query no banco de dados
+
+            // Executa a query no banco de dados
             const respostaBD = await database.query(queryDeletePedido);
-    
-            // Verificar se alguma linha foi afetada
+
+            // Verifica se alguma linha foi afetada pela query
             if (respostaBD.rowCount != 0) {
+                // Loga uma mensagem de sucesso no console
                 console.log(`Pedido removido com sucesso! ID removido: ${idPedido}`);
-                return true;
+                return true; // Retorna `true` para indicar sucesso
             }
-    
-            // Retornar false se nenhuma linha foi afetada (pedido não encontrado)
+
+            // Retorna `false` se nenhuma linha foi afetada (pedido não encontrado)
             return false;
         } catch (error) {
-             // Exibe uma mensagem de erro no console caso ocorra uma exceção.
-             console.log('Erro ao remover pedido. Verifique os logs para mais detalhes.');
-             // Loga o erro no console para depuração.
-             console.log(error);
-             // Retorna `false` indicando que a remoção falhou.
-             return false;
+            // Loga uma mensagem de erro no console em caso de exceção
+            console.log('Erro ao remover pedido. Verifique os logs para mais detalhes.');
+            // Loga o erro para análise de detalhes
+            console.log(error);
+            return false; // Retorna `false` para indicar falha na operação
         }
     }
 
+    /**
+     * Atualiza os dados de um pedido de venda no banco de dados.
+     * 
+     * Esta função atualiza os campos de um pedido na tabela `pedido_venda` com base no ID fornecido. 
+     * Retorna `true` se a atualização for bem-sucedida (linhas afetadas) ou `false` caso contrário.
+     * 
+     * @param {PedidoVenda} pedido - Objeto contendo os dados do pedido a serem atualizados.
+     * @returns {Promise<boolean>} - Retorna `true` se o pedido foi atualizado com sucesso, `false` caso contrário.
+     * 
+     * @throws {Error} - Caso ocorra um erro na execução da query, ele será logado no console.
+     */
     static async atualizarPedido(pedido: PedidoVenda): Promise<boolean> {
         try {
-            // Query para atualizar o pedido no banco
+            // Query para atualizar os dados do pedido no banco de dados
             const queryUpdatePedido = `
                 UPDATE pedido_venda SET
                     id_carro = ${pedido.getIdCarro()},
@@ -236,26 +257,24 @@ export class PedidoVenda {
                     valor_pedido = ${pedido.getValorPedido()}
                 WHERE id_pedido = ${pedido.getIdPedido()}
             `;
-    
+
             // Executa a query no banco de dados
             const respostaBD = await database.query(queryUpdatePedido);
-    
-            // Verifica se alguma linha foi afetada
+
+            // Verifica se alguma linha foi afetada pela query
             if (respostaBD.rowCount != 0) {
-                // Loga uma mensagem de sucesso no console indicando que o pedido foi atualizado.
+                // Loga uma mensagem de sucesso no console
                 console.log(`Pedido atualizado com sucesso! ID: ${pedido.getIdPedido()}`);
-                // Retorna `true` para indicar sucesso na atualização.
-                return true;
+                return true; // Retorna `true` para indicar sucesso
             }
-    
-            // Retorna false se nenhuma linha foi afetada (pedido não encontrado)
+
+            // Retorna `false` se nenhuma linha foi afetada (pedido não encontrado)
             return false;
         } catch (error) {
+            // Loga uma mensagem de erro com detalhes no console
             console.error(`Erro ao atualizar pedido. ID: ${pedido.getIdPedido()}. Detalhes: ${error}`);
-            console.log(error);
-            return false; // Retorna false para indicar falha na atualização
+            return false; // Retorna `false` para indicar falha na operação
         }
     }
-    
-    
+
 }
