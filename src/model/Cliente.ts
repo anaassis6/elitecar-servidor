@@ -49,7 +49,7 @@ export class Cliente {
      * @param idCliente novo cliente a ser identificado
      */
     public setIdCliente(idCliente: number): void {
-        this.idCliente;
+        this.idCliente = idCliente;
     }
 
     /**
@@ -119,6 +119,7 @@ export class Cliente {
 
         try {
             const querySelectCliente = `SELECT * FROM cliente`;
+
             const respostaBD = await database.query(querySelectCliente);
 
             respostaBD.rows.forEach((linha) => {
@@ -185,6 +186,69 @@ export class Cliente {
             // imprime o erro no console
             console.log(error);
             // retorno um valor falso
+            return false;
+        }
+    }
+
+    static async removerCliente (idCliente:number): Promise<boolean>{
+        try{
+            // cria uma query para deletar o objeto do banco de dados, passando como parametro o id do cliente recebido na função
+            const queryDeleteCliente = `DELETE FROM cliente WHERE id_cliente = ${idCliente}`
+            
+            //executar a query e armazenar a resposta no banco
+            const respostaBD = await database.query(queryDeleteCliente);
+
+            //verifica se o número de linhas alteradas é diferente de 0
+            if(respostaBD.rowCount != 0){
+                //exibe mensagem no console de sucesso
+                console.log(`Cliente removido com sucesso! ID removido: ${idCliente}`);
+                // retorna true = cliente removido
+                return true;
+            }
+
+            //retorna false, indicando que não foi removido
+            return false;
+
+        //trata qualquer erro que possa aparecer 
+        } catch (error){
+            // exibe uma mensagem de falha
+            console.log(`Erro ao remover cliente. Verifique os logs para mais detalhes`);
+            //imprime o erro no console
+            console.log(error);
+            //retorna false, indicando que a remoção não aconteceu
+            return false;
+        }
+    }
+
+    static async atualizarCliente(cliente: Cliente): Promise<boolean> {
+        try {
+            // Cria uma query SQL para atualizar os dados do cliente no banco de dados.
+            const queryUpdateCliente = `UPDATE cliente SET
+                                        nome = '${cliente.getNome()}',
+                                        cpf = '${cliente.getCpf()}',
+                                        telefone = '${cliente.getTelefone()}'
+                                      WHERE id_cliente = ${cliente.getIdCliente()};`;
+
+            // Executa a query no banco de dados e armazena a resposta.
+            const respostaBD = await database.query(queryUpdateCliente);
+
+            // Verifica se alguma linha foi alterada pela operação de atualização.
+            if (respostaBD.rowCount != 0) {
+                // Loga uma mensagem de sucesso no console indicando que o cliente foi atualizado.
+                console.log(`Cliente atualizado com sucesso! ID: ${cliente.getIdCliente()}`);
+                // Retorna `true` para indicar sucesso na atualização.
+                return true;
+            }
+
+            // Retorna `false` se nenhuma linha foi alterada (atualização não realizada).
+            return false;
+
+        } catch (error) {
+            // Exibe uma mensagem de erro no console caso ocorra uma exceção.
+            console.log('Erro ao atualizar o cliente. Verifique os logs para mais detalhes.');
+            // Loga o erro no console para depuração.
+            console.log(error);
+            // Retorna `false` indicando que a atualização falhou.
             return false;
         }
     }

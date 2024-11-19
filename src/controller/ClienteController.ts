@@ -79,4 +79,69 @@ export class ClienteController extends Cliente {
             return res.status(400).json({ mensagem: "Não foi possível cadastrar o cliente. Entre em contato com o administrador do sistema." });
         }
     }
+    static async remover(req: Request, res: Response): Promise<Response> {
+        try {
+            //recuperar o id do cliente a ser removido
+            const idCliente = parseInt(req.params.idCliente as string);
+
+            //chamar a função do modelo e armazenar a resposta
+            const respotaModelo = await Cliente.removerCliente(idCliente);
+
+            //verifica se a resposta do modelo foi verdadeiro
+            if (respotaModelo) {
+                //retorna um status 200 com uma mensagem de sucesso
+                return res.status(200).json({ mensagem: "O cliente foi removido com sucesso!" });
+            } else {
+                //retorna um status 400 com uma mensagem de erro
+                return res.status(400).json({ mensagem: "Erro ao remover o cliente. Entre em contato com o administrador do sistema." });
+            }
+
+            //trata qualquer erro no sistema durante o proceso    
+        } catch (error) {
+            //mensagem de erro no sistema
+            console.log(`Erro ao remover o cliente ${error}`);
+
+            //retorna mensagem de erro há quem chamou a mensagem
+            return res.status(400).json({ mensagem: "Não foi possível remover o cliente. Entre em contato com o administrador do sistema." });
+        }
+    }
+
+    static async atualizar(req: Request, res: Response): Promise<Response> {
+        try {
+            // Recupera os dados do cliente a serem atualizados do corpo da requisição.
+            const clienteRecebido: ClienteDTO = req.body;
+
+            // Recupera o ID do cliente a ser atualizado a partir dos parâmetros da URL.
+            const idClienteRecebido = parseInt(req.params.idCliente as string);
+
+            // Cria um novo objeto `Cliente` com os dados recebidos.
+            const clienteAtualizado = new Cliente(
+                clienteRecebido.nome,
+                clienteRecebido.cpf,
+                clienteRecebido.telefone
+            );
+
+            // Define o ID do cliente no objeto `clienteAtualizado`.
+            clienteAtualizado.setIdCliente(idClienteRecebido);
+
+            // Chama o método do modelo para atualizar o cliente e armazena a resposta (true ou false).
+            const respostaModelo = await Cliente.atualizarCliente(clienteAtualizado);
+
+            // Verifica se a resposta do modelo indica que o clente foi atualizado com sucesso.
+            if (respostaModelo) {
+                // Retorna uma resposta HTTP com status 200 e mensagem de sucesso.
+                return res.status(200).json({ mensagem: "Cliente atualizado com sucesso!" });
+            } else {
+                // Retorna uma resposta HTTP com status 400 e mensagem de erro.
+                return res.status(400).json({ mensagem: "Não foi possível atualizar o cliente. Entre em contato com o administrador." });
+            }
+        } catch (error) {
+            // Loga o erro no console para depuração.
+            console.log(`Erro ao atualizar o cliente: ${error}`);
+
+            // Retorna uma resposta HTTP com status 400 e mensagem de erro genérica.
+            return res.status(400).json({ mensagem: "Não foi possível atualizar o cliente. Entre em contato com o administrador." });
+        }
+    }
+
 }

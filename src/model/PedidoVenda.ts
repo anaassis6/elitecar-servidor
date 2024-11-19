@@ -141,6 +141,7 @@ export class PedidoVenda {
                 );
 
                 novoPedidoVenda.setIdPedido(linha.id_pedido);
+                
 
                 listaDePedidos.push(novoPedidoVenda);
             });
@@ -196,4 +197,65 @@ export class PedidoVenda {
             return false;
         }
     }
+
+    static async removerPedido(idPedido: number): Promise<boolean> {
+        try {
+            // Query para deletar o pedido pelo ID
+            const queryDeletePedido = `DELETE FROM pedido_venda 
+                                        WHERE id_pedido = ${idPedido}`;
+    
+            // Executar a query no banco de dados
+            const respostaBD = await database.query(queryDeletePedido);
+    
+            // Verificar se alguma linha foi afetada
+            if (respostaBD.rowCount != 0) {
+                console.log(`Pedido removido com sucesso! ID removido: ${idPedido}`);
+                return true;
+            }
+    
+            // Retornar false se nenhuma linha foi afetada (pedido não encontrado)
+            return false;
+        } catch (error) {
+             // Exibe uma mensagem de erro no console caso ocorra uma exceção.
+             console.log('Erro ao remover pedido. Verifique os logs para mais detalhes.');
+             // Loga o erro no console para depuração.
+             console.log(error);
+             // Retorna `false` indicando que a remoção falhou.
+             return false;
+        }
+    }
+
+    static async atualizarPedido(pedido: PedidoVenda): Promise<boolean> {
+        try {
+            // Query para atualizar o pedido no banco
+            const queryUpdatePedido = `
+                UPDATE pedido_venda SET
+                    id_carro = ${pedido.getIdCarro()},
+                    id_cliente = ${pedido.getIdCliente()},
+                    data_pedido = '${pedido.getDataPedido()}',
+                    valor_pedido = ${pedido.getValorPedido()}
+                WHERE id_pedido = ${pedido.getIdPedido()}
+            `;
+    
+            // Executa a query no banco de dados
+            const respostaBD = await database.query(queryUpdatePedido);
+    
+            // Verifica se alguma linha foi afetada
+            if (respostaBD.rowCount != 0) {
+                // Loga uma mensagem de sucesso no console indicando que o pedido foi atualizado.
+                console.log(`Pedido atualizado com sucesso! ID: ${pedido.getIdPedido()}`);
+                // Retorna `true` para indicar sucesso na atualização.
+                return true;
+            }
+    
+            // Retorna false se nenhuma linha foi afetada (pedido não encontrado)
+            return false;
+        } catch (error) {
+            console.error(`Erro ao atualizar pedido. ID: ${pedido.getIdPedido()}. Detalhes: ${error}`);
+            console.log(error);
+            return false; // Retorna false para indicar falha na atualização
+        }
+    }
+    
+    
 }
